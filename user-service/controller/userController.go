@@ -9,17 +9,20 @@ import (
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
 	"github.com/KumKeeHyun/medium-rare/user-service/usecase"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type UserController struct {
-	uu usecase.UserUsecase
-	au usecase.AuthUsecase
+	uu  usecase.UserUsecase
+	au  usecase.AuthUsecase
+	log *zap.Logger
 }
 
-func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase) *UserController {
+func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase, log *zap.Logger) *UserController {
 	return &UserController{
-		uu: uu,
-		au: au,
+		uu:  uu,
+		au:  au,
+		log: log,
 	}
 }
 

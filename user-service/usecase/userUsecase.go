@@ -3,16 +3,19 @@ package usecase
 import (
 	"github.com/KumKeeHyun/medium-rare/user-service/dao"
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
+	"go.uber.org/zap"
 )
 
 type userUsecase struct {
-	ur dao.UserRepository
+	ur  dao.UserRepository
+	log *zap.Logger
 	// producer
 }
 
-func NewUserUsecase(ur dao.UserRepository) UserUsecase {
+func NewUserUsecase(ur dao.UserRepository, log *zap.Logger) UserUsecase {
 	return &userUsecase{
-		ur: ur,
+		ur:  ur,
+		log: log,
 	}
 }
 

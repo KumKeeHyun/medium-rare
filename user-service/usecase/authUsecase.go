@@ -6,15 +6,18 @@ import (
 	"github.com/KumKeeHyun/medium-rare/user-service/dao"
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
 	"github.com/dgrijalva/jwt-go"
+	"go.uber.org/zap"
 )
 
 type authUsecase struct {
-	ur dao.UserRepository
+	ur  dao.UserRepository
+	log *zap.Logger
 }
 
-func NewAuthUsecase(ur dao.UserRepository) AuthUsecase {
+func NewAuthUsecase(ur dao.UserRepository, log *zap.Logger) AuthUsecase {
 	return &authUsecase{
-		ur: ur,
+		ur:  ur,
+		log: log,
 	}
 }
 
