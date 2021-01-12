@@ -9,7 +9,10 @@ import (
 	"github.com/KumKeeHyun/medium-rare/user-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/user-service/usecase"
 	"github.com/KumKeeHyun/medium-rare/user-service/util"
+	"github.com/chenjiandongx/ginprom"
 	ginzap "github.com/gin-contrib/zap"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -25,7 +28,8 @@ func main() {
 	// 	panic(err)
 	// }
 
-	syncProducer, err := util.BuildSyncProducer()
+	// syncProducer, err := util.BuildSyncProducer()
+	syncProducer, err := util.BuildMockSyncProducer()
 	if err != nil {
 		panic(err)
 	}
@@ -41,11 +45,15 @@ func main() {
 	logger.Info("set gin router")
 
 	r := gin.Default()
-	jwtAuth := middleware.JwtAuth()
-	notLoggedIn := middleware.EnsureNotLoggedIn()
+
+	r.Use(ginprom.PromMiddleware(nil))
+	r.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
 
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
+
+	jwtAuth := middleware.JwtAuth()
+	notLoggedIn := middleware.EnsureNotLoggedIn()
 
 	v1 := r.Group("/v1")
 	{
@@ -55,12 +63,12 @@ func main() {
 			user.GET("/:id", uc.GetUser)
 			user.POST("", notLoggedIn, uc.CreateUser)
 			user.DELETE(":id", jwtAuth, uc.DeleteUser)
-		}
 
-		auth := v1.Group("/auth")
-		{
-			auth.POST("", notLoggedIn, uc.Authorize)
-			auth.POST("/refresh", uc.RefreshAuth)
+			auth := user.Group("/auth")
+			{
+				auth.POST("", notLoggedIn, uc.Authorize)
+				auth.POST("/refresh", uc.RefreshAuth)
+			}
 		}
 	}
 
