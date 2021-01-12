@@ -6,9 +6,10 @@ import (
 )
 
 type AppConfig struct {
-	Address     string     `yaml:"address"`
-	MysqlConfig DataConfig `yaml:"mysqlConfig"`
-	ZapConfig   LogConfig  `yaml:"zapConfig"`
+	Address     string      `yaml:"address"`
+	MysqlConfig DataConfig  `yaml:"mysqlConfig"`
+	ZapConfig   LogConfig   `yaml:"zapConfig"`
+	KafkaConfig KafkaConfig `yaml:"kafkaConfig"`
 }
 
 type DataConfig struct {
@@ -57,4 +58,6 @@ func init() {
 	App.ZapConfig.Level = getEnvStr("APP_LOG_LEVEL", "debug")
 	App.ZapConfig.Encoding = getEnvStr("APP_LOG_ENCODING", "json")
 	App.ZapConfig.EableCaller = false
+
+	App.KafkaConfig.Brokers = getEnvStrAry("APP_KAFKA_BROKERS", []string{"127.0.0.1:9092"})
 }

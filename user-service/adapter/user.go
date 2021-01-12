@@ -36,7 +36,7 @@ func ToAdapterUsers(dus []domain.User) []User {
 	return us
 }
 
-type UserEvent struct {
+type CreateUserEvent struct {
 	ID     int    `json:"id"`
 	Email  string `json:"email"`
 	Name   string `json:"name"`
@@ -44,8 +44,8 @@ type UserEvent struct {
 	Birth  int    `json:"birth"`
 }
 
-func ToAdapterUserEvent(du *domain.User) UserEvent {
-	return UserEvent{
+func ToAdapterCreateUserEvent(du *domain.User) CreateUserEvent {
+	return CreateUserEvent{
 		ID:     du.ID,
 		Email:  du.Email,
 		Name:   du.Name,
@@ -54,10 +54,12 @@ func ToAdapterUserEvent(du *domain.User) UserEvent {
 	}
 }
 
-func ToAdapterUserEvents(dus []domain.User) []UserEvent {
-	us := make([]UserEvent, 0, len(dus))
-	for _, du := range dus {
-		us = append(us, ToAdapterUserEvent(&du))
+type DeleteUserEvent struct {
+	ID int `json:"id"`
+}
+
+func ToAdapterDeleteUserEvent(du *domain.User) DeleteUserEvent {
+	return DeleteUserEvent{
+		ID: du.ID,
 	}
-	return us
 }

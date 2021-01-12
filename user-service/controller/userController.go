@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -8,21 +9,24 @@ import (
 	"github.com/KumKeeHyun/medium-rare/user-service/adapter"
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
 	"github.com/KumKeeHyun/medium-rare/user-service/usecase"
+	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type UserController struct {
-	uu  usecase.UserUsecase
-	au  usecase.AuthUsecase
-	log *zap.Logger
+	uu       usecase.UserUsecase
+	au       usecase.AuthUsecase
+	producer sarama.SyncProducer
+	log      *zap.Logger
 }
 
-func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase, log *zap.Logger) *UserController {
+func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase, sp sarama.SyncProducer, log *zap.Logger) *UserController {
 	return &UserController{
-		uu:  uu,
-		au:  au,
-		log: log,
+		uu:       uu,
+		au:       au,
+		producer: sp,
+		log:      log,
 	}
 }
 
@@ -76,6 +80,13 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 		return
 	}
 
+	mshld, _ := json.Marshal(adapter.ToAdapterCreateUserEvent(&userResult))
+
+	uc.producer.SendMessage(&sarama.ProducerMessage{
+		Topic: "create-user",
+		Value: sarama.ByteEncoder(mshld),
+	})
+
 	c.JSON(http.StatusOK, adapter.ToAdapterUser(&userResult))
 }
 
@@ -97,9 +108,16 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 		c.AbortWithStatus(http.StatusForbidden)
 	}
 
-	if err := uc.uu.Unregister(domain.User{ID: id}); err != nil {
+	user := domain.User{ID: id}
+	if err := uc.uu.Unregister(user); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+
+	mshld, _ := json.Marshal(adapter.ToAdapterDeleteUserEvent(&user))
+	uc.producer.SendMessage(&sarama.ProducerMessage{
+		Topic: "delete-user",
+		Value: sarama.ByteEncoder(mshld),
+	})
 
 	c.JSON(http.StatusOK, id)
 }
