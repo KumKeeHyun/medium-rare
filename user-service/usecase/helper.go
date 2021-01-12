@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"time"
 
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
@@ -15,7 +16,7 @@ func validateUser(user *domain.User) error {
 func hashingPassword(user *domain.User) {
 	pw := user.Password + "_kkh"
 	res := sha256.Sum256([]byte(pw))
-	user.Password = string(res[:])
+	user.Password = hex.EncodeToString(res[:])
 }
 
 func generateTokenPair(user *domain.User) (domain.TokenPair, error) {

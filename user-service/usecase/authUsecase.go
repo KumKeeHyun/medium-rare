@@ -29,6 +29,9 @@ func (au *authUsecase) Login(user domain.User) (domain.TokenPair, error) {
 
 	hashingPassword(&user)
 	if savedUser.Password != user.Password {
+		au.log.Debug("password check",
+			zap.String("req pw", user.Password),
+			zap.String("db qw", savedUser.Password))
 		return domain.TokenPair{}, fmt.Errorf("Wrong password for %s", user.Email)
 	}
 
