@@ -78,6 +78,29 @@ func (ur *memoryUserRepository) Save(user domain.User) (domain.User, error) {
 	return user, nil
 }
 
+func (ur *memoryUserRepository) Update(user domain.User) (domain.User, error) {
+	u, err := ur.FindByID(user.ID)
+	if err != nil {
+		return user, err
+	}
+	nilUser := domain.User{}
+	switch {
+	case nilUser.Name != user.Name:
+		u.Name = user.Name
+		fallthrough
+	case nilUser.Email != user.Email:
+		u.Email = user.Email
+		fallthrough
+	case nilUser.Password != user.Password:
+		u.Password = user.Password
+		fallthrough
+	case nilUser.Role != user.Role:
+		u.Role = user.Role
+	}
+	store[u.ID] = u
+	return u, nil
+}
+
 func (ur *memoryUserRepository) Delete(user domain.User) error {
 	delete(store, user.ID)
 	return nil

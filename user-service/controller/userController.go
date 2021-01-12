@@ -36,7 +36,7 @@ func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase, sp sarama
 func (uc *UserController) ListUsers(c *gin.Context) {
 	us, err := uc.uu.FindUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"detail": err.Error()})
 		return
 	}
 
@@ -50,13 +50,13 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 func (uc *UserController) GetUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
 		return
 	}
 
 	u, err := uc.uu.FindOne(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"detail": err.Error()})
 		return
 	}
 
@@ -70,18 +70,17 @@ func (uc *UserController) GetUser(c *gin.Context) {
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
 		return
 	}
 
 	userResult, err := uc.uu.Register(user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"detail": err.Error()})
 		return
 	}
 
 	mshld, _ := json.Marshal(adapter.ToAdapterCreateUserEvent(&userResult))
-
 	uc.producer.SendMessage(&sarama.ProducerMessage{
 		Topic: "create-user",
 		Value: sarama.ByteEncoder(mshld),
@@ -96,21 +95,25 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	claims, err := getAccessClaime(c)
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "unauthorized user"})
+		return
 	}
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
+		return
 	}
 
 	if claims.ID != id {
-		c.AbortWithStatus(http.StatusForbidden)
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"detail": "URL param is not user's id"})
+		return
 	}
 
 	user := domain.User{ID: id}
 	if err := uc.uu.Unregister(user); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"detail": err.Error()})
+		return
 	}
 
 	mshld, _ := json.Marshal(adapter.ToAdapterDeleteUserEvent(&user))
@@ -129,13 +132,14 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 func (uc *UserController) Authorize(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
 		return
 	}
 
 	tokenPair, err := uc.au.Login(user)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, tokenPair)
@@ -151,13 +155,14 @@ func (uc *UserController) RefreshAuth(c *gin.Context) {
 	}
 	var tokenReq tokenReqBody
 	if err := c.ShouldBindJSON(&tokenReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
 		return
 	}
 
 	accessToken, err := uc.au.RefreshToken(tokenReq.RefreshToken)
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})

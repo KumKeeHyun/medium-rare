@@ -36,6 +36,10 @@ func (ur *sqlUserRepository) Save(user domain.User) (domain.User, error) {
 	return user, ur.db.Create(&user).Error
 }
 
+func (ur *sqlUserRepository) Update(user domain.User) (domain.User, error) {
+	return user, ur.db.Model(&user).Updates(user).Error
+}
+
 func (ur *sqlUserRepository) Delete(user domain.User) error {
 	return ur.db.Delete(&domain.User{}, user.ID).Error
 }

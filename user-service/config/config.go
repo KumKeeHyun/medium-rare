@@ -7,6 +7,7 @@ import (
 
 type AppConfig struct {
 	Address     string      `yaml:"address"`
+	JWTSecret   string      `yaml:"ywtSecret"`
 	MysqlConfig DataConfig  `yaml:"mysqlConfig"`
 	ZapConfig   LogConfig   `yaml:"zapConfig"`
 	KafkaConfig KafkaConfig `yaml:"kafkaConfig"`
@@ -50,6 +51,7 @@ func getEnvStrAry(env string, def []string) (envValue []string) {
 
 func init() {
 	App.Address = getEnvStr("APP_ADDR", "0.0.0.0:8081")
+	App.JWTSecret = getEnvStr("APP_JWTSECRET", "kkh")
 
 	App.MysqlConfig.Driver = getEnvStr("APP_DB_DRIVER", "mysql")
 	App.MysqlConfig.DbURL = getEnvStr("APP_DB_URL", "root:rootpw@tcp(127.0.0.1:3306)/userDB?charset=utf8mb4&parseTime=True&loc=Local")

@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"time"
 
+	"github.com/KumKeeHyun/medium-rare/user-service/config"
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -34,7 +35,7 @@ func generateTokenPair(user *domain.User) (domain.TokenPair, error) {
 	}
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rc)
-	rs, err := rt.SignedString([]byte("kkh"))
+	rs, err := rt.SignedString([]byte(config.App.JWTSecret))
 
 	if err != nil {
 		return domain.TokenPair{}, err
@@ -61,7 +62,7 @@ func generateAccessToken(user *domain.User) (string, error) {
 	}
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, ac)
-	as, err := at.SignedString([]byte("kkh"))
+	as, err := at.SignedString([]byte(config.App.JWTSecret))
 
 	if err != nil {
 		return "", err

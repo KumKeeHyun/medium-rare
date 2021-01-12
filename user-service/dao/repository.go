@@ -8,5 +8,6 @@ type UserRepository interface {
 	FindByName(name string) (domain.User, error)
 	FindAll() ([]domain.User, error)
 	Save(user domain.User) (domain.User, error)
+	Update(user domain.User) (domain.User, error)
 	Delete(user domain.User) error
 }

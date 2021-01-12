@@ -3,6 +3,7 @@ package usecase
 import (
 	"fmt"
 
+	"github.com/KumKeeHyun/medium-rare/user-service/config"
 	"github.com/KumKeeHyun/medium-rare/user-service/dao"
 	"github.com/KumKeeHyun/medium-rare/user-service/domain"
 	"github.com/dgrijalva/jwt-go"
@@ -37,7 +38,7 @@ func (au *authUsecase) Login(user domain.User) (domain.TokenPair, error) {
 
 	tokenPair, err := generateTokenPair(&savedUser)
 	if err != nil {
-		return tokenPair, err
+		return tokenPair, fmt.Errorf("fail to generate jwt token : %w", err)
 	}
 
 	return tokenPair, nil
@@ -49,7 +50,7 @@ func (au *authUsecase) RefreshToken(rts string) (string, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte("kkh"), nil
+		return []byte(config.App.JWTSecret), nil
 	})
 
 	if err != nil || !token.Valid {
@@ -58,12 +59,12 @@ func (au *authUsecase) RefreshToken(rts string) (string, error) {
 
 	claim, ok := token.Claims.(*domain.RefreshClaim)
 	if !ok {
-		return "", fmt.Errorf("Unexpected custom claim type")
+		return "", fmt.Errorf("Unexpected claim type")
 	}
 
 	userInfo, err := au.ur.FindByID(claim.ID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot find user : %w", err)
 	}
 
 	return generateAccessToken(&userInfo)
