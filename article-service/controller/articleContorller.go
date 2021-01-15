@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/KumKeeHyun/medium-rare/article-service/adapter"
@@ -48,22 +49,29 @@ func (ac *ArticleController) ListArticles(c *gin.Context) {
 
 // GET /v1/articles/list
 func (ac *ArticleController) ListArticlesByIDList(c *gin.Context) {
-	type idListRequestBody struct {
-		IDs []int `json:"ids"`
-	}
-	var reqBody idListRequestBody
-	if err := c.ShouldBindJSON(&reqBody); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
-		return
+	strIDs := strings.Split(c.Query("ids"), ",")
+	if len(strIDs) == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": "must request with QueryArray named 'ids'"})
 	}
 
-	articles, err := ac.arr.FindArticleByIDList(reqBody.IDs)
+	ids := make([]int, 0, len(strIDs))
+	for _, strID := range strIDs {
+		id, err := strconv.Atoi(strID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": "'ids' QueryArray require int array"})
+		}
+		ids = append(ids, id)
+	}
+
+	articles, err := ac.arr.FindArticleByIDList(ids)
 	if err != nil {
+		ac.log.Error("Fail to get article list from db",
+			zap.Error(err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"detail": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"article_list": articles})
+	c.JSON(http.StatusOK, articles)
 }
 
 // GET /v1/articles/search?q=
