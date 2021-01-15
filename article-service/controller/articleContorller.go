@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/KumKeeHyun/medium-rare/article-service/adapter"
 	"github.com/KumKeeHyun/medium-rare/article-service/dao"
@@ -82,7 +83,7 @@ func (ac *ArticleController) SearchArticles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
-// GET /v1/articles/:article-id
+// GET /v1/articles/article/:article-id
 func (ac *ArticleController) GetArticle(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -113,6 +114,7 @@ func (ac *ArticleController) GetArticle(c *gin.Context) {
 				AuthorID:   article.UserID,
 				AuthorName: article.UserName,
 			},
+			Timestamp: time.Now(),
 		}
 
 		mshld, _ := json.Marshal(rae)
@@ -125,7 +127,7 @@ func (ac *ArticleController) GetArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"article": article})
 }
 
-// POST /v1/articles
+// POST /v1/articles/article
 func (ac *ArticleController) CreateArticle(c *gin.Context) {
 	var article domain.Article
 	if err := c.ShouldBindJSON(&article); err != nil {
@@ -150,7 +152,7 @@ func (ac *ArticleController) CreateArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"created": articleResult})
 }
 
-// DELETE /v1/articles/:article-id
+// DELETE /v1/articles/article/:article-id
 func (ac *ArticleController) DeleteArticle(c *gin.Context) {
 	articleID, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -185,7 +187,7 @@ func (ac *ArticleController) DeleteArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, articleID)
 }
 
-// POST /v1/articles/:article-id/reply
+// POST /v1/articles/article/:article-id/reply
 func (ac *ArticleController) CreateReply(c *gin.Context) {
 	var reply domain.Reply
 
@@ -219,7 +221,7 @@ func (ac *ArticleController) CreateReply(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"reply": replyResult})
 }
 
-// DELETE /v1/articles/:article-id/reply/:reply-id
+// DELETE /v1/articles/article/:article-id/reply/:reply-id
 func (ac *ArticleController) DeleteReply(c *gin.Context) {
 	articleID, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -263,7 +265,7 @@ func (ac *ArticleController) DeleteReply(c *gin.Context) {
 	c.JSON(http.StatusOK, replyID)
 }
 
-// POST /v1/articles/:article-id/reply/:reply-id/nested-reply
+// POST /v1/articles/article/:article-id/reply/:reply-id/nested-reply
 func (ac *ArticleController) CreateNestedReply(c *gin.Context) {
 	var reply domain.NestedReply
 
@@ -297,7 +299,7 @@ func (ac *ArticleController) CreateNestedReply(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"reply": replyResult})
 }
 
-// POST /v1/articles/:article-id/reply/:reply-id/nested-reply/:nested-reply-id
+// POST /v1/articles/article/:article-id/reply/:reply-id/nested-reply/:nested-reply-id
 func (ac *ArticleController) DeleteNestedReply(c *gin.Context) {
 	replyID, err := strconv.Atoi(c.Param("reply-id"))
 	if err != nil {
