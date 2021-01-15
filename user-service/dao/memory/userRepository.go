@@ -93,9 +93,6 @@ func (ur *memoryUserRepository) Update(user domain.User) (domain.User, error) {
 		fallthrough
 	case nilUser.Password != user.Password:
 		u.Password = user.Password
-		fallthrough
-	case nilUser.Role != user.Role:
-		u.Role = user.Role
 	}
 	store[u.ID] = u
 	return u, nil

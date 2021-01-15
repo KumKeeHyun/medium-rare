@@ -33,9 +33,6 @@ func (uu *userUsecase) Register(user domain.User) (domain.User, error) {
 	}
 
 	hashingPassword(&user)
-	// 이메일 인증 전(init), 후(general)
-	// domain에 ENUM 처럼 정의해야함
-	user.Role = "init"
 
 	return uu.ur.Save(user)
 }

@@ -5,7 +5,7 @@ import (
 
 	"github.com/KumKeeHyun/medium-rare/user-service/config"
 	"github.com/KumKeeHyun/medium-rare/user-service/controller"
-	"github.com/KumKeeHyun/medium-rare/user-service/dao/memory"
+	"github.com/KumKeeHyun/medium-rare/user-service/dao/sql"
 	"github.com/KumKeeHyun/medium-rare/user-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/user-service/usecase"
 	"github.com/KumKeeHyun/medium-rare/user-service/util"
@@ -23,10 +23,10 @@ func main() {
 		panic(err)
 	}
 
-	// db, err := util.BuildMysqlConnection()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	db, err := util.BuildMysqlConnection()
+	if err != nil {
+		panic(err)
+	}
 
 	// syncProducer, err := util.BuildSyncProducer()
 	syncProducer, err := util.BuildMockSyncProducer()
@@ -36,8 +36,8 @@ func main() {
 
 	logger.Info("set dependency injection")
 
-	ur := memory.NewMemoryUserRepository()
-	// ur := sql.NewSqlUserRepository(db)
+	// ur := memory.NewMemoryUserRepository()
+	ur := sql.NewSqlUserRepository(db)
 	uu := usecase.NewUserUsecase(ur, logger)
 	au := usecase.NewAuthUsecase(ur, logger)
 	uc := controller.NewUserController(uu, au, syncProducer, logger)
@@ -52,8 +52,9 @@ func main() {
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
 
-	jwtAuth := middleware.JwtAuth()
-	notLoggedIn := middleware.EnsureNotLoggedIn()
+	jwtAuth := middleware.CheckJwtAuth()
+	loggedIn := middleware.EnsureAuth()
+	notLoggedIn := middleware.EnsureNotAuth()
 
 	v1 := r.Group("/v1")
 	{
@@ -62,7 +63,7 @@ func main() {
 			user.GET("", uc.ListUsers)
 			user.GET("/:id", uc.GetUser)
 			user.POST("", notLoggedIn, uc.CreateUser)
-			user.DELETE(":id", jwtAuth, uc.DeleteUser)
+			user.DELETE(":id", jwtAuth, loggedIn, uc.DeleteUser)
 
 			auth := user.Group("/auth")
 			{

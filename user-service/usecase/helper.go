@@ -54,7 +54,6 @@ func generateAccessToken(user *domain.User) (string, error) {
 		Name:   user.Name,
 		Gender: user.Gender,
 		Birth:  user.Birth,
-		Role:   user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * 10).Unix(),
 			Issuer:    "kkh",
