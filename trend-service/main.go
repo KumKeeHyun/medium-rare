@@ -16,12 +16,7 @@ func main() {
 		panic(err)
 	}
 
-	cg, err := util.BuildConsumerGroup(logger)
-	if err != nil {
-		panic(err)
-	}
-
-	er := erouter.NewEventRouter(cg, logger)
+	er := erouter.NewEventRouter("trend", logger)
 	er.SetHandler("read-article", func(key, value []byte) {
 		logger.Info("handle event",
 			zap.String("topic", "read-article"),
@@ -33,7 +28,9 @@ func main() {
 			zap.ByteString("value", value))
 	})
 
-	er.Start()
+	if err := er.StartRouter(); err != nil {
+		panic(err)
+	}
 
 	sigterm := make(chan os.Signal, 1)
 	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
