@@ -50,7 +50,7 @@ func getEnvStrAry(env string, def []string) (envValue []string) {
 }
 
 func init() {
-	App.Address = getEnvStr("APP_ADDR", "0.0.0.0:8081")
+	App.Address = getEnvStr("APP_ADDR", "0.0.0.0:8082")
 	App.JWTSecret = getEnvStr("APP_JWTSECRET", "kkh")
 
 	App.MysqlConfig.Driver = getEnvStr("APP_DB_DRIVER", "mysql")

@@ -8,6 +8,5 @@ type AccessClaim struct {
 	Name   string `json:"name"`
 	Gender string `json:"gender"`
 	Birth  int    `json:"birth"`
-	Role   string `json:"role"`
 	jwt.StandardClaims
 }

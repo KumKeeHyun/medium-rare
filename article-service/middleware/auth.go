@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func JwtAuth() gin.HandlerFunc {
+func CheckJwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tStr := c.GetHeader("Authorization")
 
@@ -22,18 +22,22 @@ func JwtAuth() gin.HandlerFunc {
 			return []byte(config.App.JWTSecret), nil
 		})
 
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": err.Error()})
-			return
+		if err == nil {
+			if claims, ok := token.Claims.(*domain.AccessClaim); ok && token.Valid {
+				c.Set("claims", claims)
+			}
 		}
 
-		claims, ok := token.Claims.(*domain.AccessClaim)
-		if !ok || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "Unexpected claim type or Unvaild token"})
+		c.Next()
+	}
+}
+
+func EnsureAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if _, exist := c.Get("claims"); !exist {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "authentication is required"})
 			return
 		}
-
-		c.Set("claims", claims)
 		c.Next()
 	}
 }
