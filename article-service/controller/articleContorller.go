@@ -52,6 +52,7 @@ func (ac *ArticleController) ListArticlesByIDList(c *gin.Context) {
 	strIDs := strings.Split(c.Query("ids"), ",")
 	if len(strIDs) == 0 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": "must request with QueryArray named 'ids'"})
+		return
 	}
 
 	ids := make([]int, 0, len(strIDs))
@@ -59,6 +60,7 @@ func (ac *ArticleController) ListArticlesByIDList(c *gin.Context) {
 		id, err := strconv.Atoi(strID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": "'ids' QueryArray require int array"})
+			return
 		}
 		ids = append(ids, id)
 	}

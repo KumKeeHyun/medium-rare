@@ -6,11 +6,17 @@ import (
 )
 
 type AppConfig struct {
-	Address     string      `yaml:"address"`
-	JWTSecret   string      `yaml:"jwtSecret"`
-	MysqlConfig DataConfig  `yaml:"mysqlConfig"`
-	ZapConfig   LogConfig   `yaml:"zapConfig"`
-	KafkaConfig KafkaConfig `yaml:"kafkaConfig"`
+	Address       string        `yaml:"address"`
+	JWTSecret     string        `yaml:"jwtSecret"`
+	ArticleConfig ServiceConfig `yaml:"articleConfig"`
+	MysqlConfig   DataConfig    `yaml:"mysqlConfig"`
+	ZapConfig     LogConfig     `yaml:"zapConfig"`
+	KafkaConfig   KafkaConfig   `yaml:"kafkaConfig"`
+}
+
+type ServiceConfig struct {
+	Address string `yaml:"address"`
+	URL     string `yaml:"url"`
 }
 
 type DataConfig struct {
@@ -52,6 +58,9 @@ func getEnvStrAry(env string, def []string) (envValue []string) {
 func init() {
 	App.Address = getEnvStr("APP_ADDR", "0.0.0.0:8084")
 	App.JWTSecret = getEnvStr("APP_JWTSECRET", "kkh")
+
+	App.ArticleConfig.Address = getEnvStr("APP_ARTICLE_ADDR", "127.0.0.1:8082")
+	App.ArticleConfig.URL = getEnvStr("APP_ARTICLE_URL", "/v1/articles/list")
 
 	App.MysqlConfig.Driver = getEnvStr("APP_DB_DRIVER", "mysql")
 	App.MysqlConfig.DbURL = getEnvStr("APP_DB_URL", "root:rootpw@tcp(127.0.0.1:3306)/trendDB?charset=utf8mb4&parseTime=True&loc=Local")

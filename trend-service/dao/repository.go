@@ -6,6 +6,3 @@ type ReadRecordRepository interface {
 	Save(record domain.ReadRecord) (domain.ReadRecord, error)
 	FindArticlesByQuery(query domain.Query) ([]int, error)
 }
-
-type TrendRepository interface {
-}

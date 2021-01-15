@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-
+	"github.com/KumKeeHyun/medium-rare/trend-service/config"
 	"github.com/KumKeeHyun/medium-rare/trend-service/controller"
 	"github.com/KumKeeHyun/medium-rare/trend-service/dao/sql"
+	"github.com/KumKeeHyun/medium-rare/trend-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util/erouter"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -24,6 +24,7 @@ func main() {
 
 	rrr := sql.NewSqlReadRecordRepository(db)
 	ec := controller.NewEventController(rrr, logger)
+	tc := controller.NewTrendController(rrr, logger)
 
 	er := erouter.NewEventRouter("trend", logger)
 	er.SetHandler("read-article", ec.ReadArticle)
@@ -31,10 +32,24 @@ func main() {
 	if err := er.StartRouter(); err != nil {
 		panic(err)
 	}
+	defer er.Stop()
 
-	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGINT, syscall.SIGTERM)
-	<-sigterm
-	logger.Info("stop")
-	er.Stop()
+	r := gin.Default()
+
+	jwtAuth := middleware.CheckJwtAuth()
+	loggedIn := middleware.EnsureAuth()
+
+	v1 := r.Group("/v1")
+	{
+		trend := v1.Group("/trend")
+		{
+			trend.GET("", tc.ListTrend)
+			trend.GET("/user", jwtAuth, loggedIn, tc.ListTrendForUser)
+		}
+	}
+
+	if err := r.Run(config.App.Address); err != nil {
+		logger.Fatal("fail to start gin server",
+			zap.Error(err))
+	}
 }
