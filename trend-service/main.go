@@ -5,9 +5,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/KumKeeHyun/medium-rare/trend-service/controller"
+	"github.com/KumKeeHyun/medium-rare/trend-service/dao/sql"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util/erouter"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -16,17 +17,16 @@ func main() {
 		panic(err)
 	}
 
+	db, err := util.BuildMysqlConnection()
+	if err != nil {
+		panic(err)
+	}
+
+	rrr := sql.NewSqlReadRecordRepository(db)
+	ec := controller.NewEventController(rrr, logger)
+
 	er := erouter.NewEventRouter("trend", logger)
-	er.SetHandler("read-article", func(key, value []byte) {
-		logger.Info("handle event",
-			zap.String("topic", "read-article"),
-			zap.ByteString("value", value))
-	})
-	er.SetHandler("create-user", func(key, value []byte) {
-		logger.Info("handle event",
-			zap.String("topic", "create-user"),
-			zap.ByteString("value", value))
-	})
+	er.SetHandler("read-article", ec.ReadArticle)
 
 	if err := er.StartRouter(); err != nil {
 		panic(err)

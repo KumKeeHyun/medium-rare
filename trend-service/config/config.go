@@ -54,7 +54,7 @@ func init() {
 	App.JWTSecret = getEnvStr("APP_JWTSECRET", "kkh")
 
 	App.MysqlConfig.Driver = getEnvStr("APP_DB_DRIVER", "mysql")
-	App.MysqlConfig.DbURL = getEnvStr("APP_DB_URL", "root:rootpw@tcp(127.0.0.1:3306)/userDB?charset=utf8mb4&parseTime=True&loc=Local")
+	App.MysqlConfig.DbURL = getEnvStr("APP_DB_URL", "root:rootpw@tcp(127.0.0.1:3306)/trendDB?charset=utf8mb4&parseTime=True&loc=Local")
 
 	App.ZapConfig.OutputPaths = getEnvStrAry("APP_LOG_OUTPUTS", []string{"stdout"})
 	App.ZapConfig.Level = getEnvStr("APP_LOG_LEVEL", "debug")

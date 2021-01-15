@@ -1,5 +1,9 @@
 # Medium Rare
+![image](https://user-images.githubusercontent.com/44857109/104845699-2170e280-591a-11eb-8150-c3db687cb3fa.png)
 
-![image](https://user-images.githubusercontent.com/44857109/104147425-8c4d8580-5411-11eb-9b17-9ce349acc28e.png)
+마이크로서비스 아키텍처로 만들어보는 예시 프로젝트
 
-Example of Microservice
+## Coupling
+- user <-> reading-list (kafka event)
+- article <-> reading-list (kafka event, RESTful API)
+- article <-> trend (kafka event, RESTful API)
