@@ -1,5 +1,7 @@
 package adapter
 
+import "time"
+
 type UserInfo struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
@@ -14,6 +16,7 @@ type ArticleInfo struct {
 }
 
 type ReadArticleEvent struct {
-	User    UserInfo    `json:"user"`
-	Article ArticleInfo `json:"article"`
+	User      UserInfo    `json:"user"`
+	Article   ArticleInfo `json:"article"`
+	Timestamp time.Time   `json:"timestamp"`
 }

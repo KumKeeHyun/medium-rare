@@ -5,4 +5,6 @@ go 1.13
 require (
 	github.com/Shopify/sarama v1.27.2
 	go.uber.org/zap v1.16.0
+	gorm.io/driver/mysql v1.0.3
+	gorm.io/gorm v1.20.11
 )
