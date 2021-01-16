@@ -1,0 +1,198 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Medium Rare Reading List Service",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/v1/reading-list/recent": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article that user recently read",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/adapter.ArticleList"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/reading-list/saved": {
+            "get": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List article that user save",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/adapter.ArticleList"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWTToken": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "create saved entry",
+                "parameters": [
+                    {
+                        "description": "article id",
+                        "name": "article_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Saved"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.HttpError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "adapter.Article": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "example contents"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "title": {
+                    "type": "string",
+                    "example": "example title"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_name": {
+                    "type": "string",
+                    "example": "test"
+                }
+            }
+        },
+        "adapter.ArticleList": {
+            "type": "object",
+            "properties": {
+                "article_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/adapter.Article"
+                    }
+                }
+            }
+        },
+        "controller.HttpError": {
+            "type": "object",
+            "properties": {
+                "detail": {
+                    "type": "string",
+                    "example": "Some error comment"
+                }
+            }
+        },
+        "domain.Saved": {
+            "type": "object",
+            "properties": {
+                "article_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2021-01-15T09:44:35.151+09:00"
+                },
+                "user_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWTToken": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

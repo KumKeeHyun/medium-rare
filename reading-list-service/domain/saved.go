@@ -6,9 +6,9 @@ import (
 )
 
 type Saved struct {
-	UserID    int       `json:"user_id" gorm:"primaryKey;not null"`
-	ArticleID int       `json:"article_id" gorm:"primaryKey;not null"`
-	Timestamp time.Time `json:"timestamp" gorm:"not null"`
+	UserID    int       `json:"user_id" gorm:"primaryKey;not null" example:"1"`
+	ArticleID int       `json:"article_id" gorm:"primaryKey;not null" example:"1"`
+	Timestamp time.Time `json:"timestamp" gorm:"not null" example:"2021-01-15T09:44:35.151+09:00"`
 }
 
 func SavedsToQuery(ss []Saved) string {

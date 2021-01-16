@@ -1,0 +1,127 @@
+definitions:
+  adapter.Article:
+    properties:
+      content:
+        example: example contents
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: example title
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+  adapter.ArticleList:
+    properties:
+      article_list:
+        items:
+          $ref: '#/definitions/adapter.Article'
+        type: array
+    type: object
+  controller.HttpError:
+    properties:
+      detail:
+        example: Some error comment
+        type: string
+    type: object
+  domain.Saved:
+    properties:
+      article_id:
+        example: 1
+        type: integer
+      timestamp:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+    type: object
+info:
+  contact: {}
+  title: Medium Rare Reading List Service
+  version: 0.0.1
+paths:
+  /v1/reading-list/recent:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.ArticleList'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: List article that user recently read
+  /v1/reading-list/saved:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.ArticleList'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: List article that user save
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: article id
+        in: body
+        name: article_id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Saved'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: create saved entry
+securityDefinitions:
+  JWTToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

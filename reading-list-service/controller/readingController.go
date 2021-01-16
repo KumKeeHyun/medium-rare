@@ -27,6 +27,15 @@ func NewReadingController(rr dao.ReadingRepository, log *zap.Logger) *ReadingCon
 	}
 }
 
+// ListRecent swagger
+// @Summary List article that user recently read
+// @Accept json
+// @Produce json
+// @Success 200 {object} adapter.ArticleList
+// @Success 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/reading-list/recent [get]
 func (rc *ReadingController) ListRecent(c *gin.Context) {
 	claims, exists := getAccessClaims(c)
 	if !exists {
@@ -58,9 +67,19 @@ func (rc *ReadingController) ListRecent(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"recent": articles})
+	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
+// SaveArticle swagger
+// @Summary create saved entry
+// @Accept multipart/form-data
+// @Produce json
+// @Param article_id body int true "article id"
+// @Success 200 {object} domain.Saved
+// @Success 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/reading-list/saved [post]
 func (rc *ReadingController) SaveArticle(c *gin.Context) {
 	claims, exists := getAccessClaims(c)
 	if !exists {
@@ -89,6 +108,15 @@ func (rc *ReadingController) SaveArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// ListSaved swagger
+// @Summary List article that user save
+// @Accept json
+// @Produce json
+// @Success 200 {object} adapter.ArticleList
+// @Success 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/reading-list/saved [get]
 func (rc *ReadingController) ListSaved(c *gin.Context) {
 	claims, exists := getAccessClaims(c)
 	if !exists {
@@ -120,7 +148,7 @@ func (rc *ReadingController) ListSaved(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"saved": articles})
+	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
 func getAccessClaims(c *gin.Context) (*domain.AccessClaim, bool) {
@@ -130,4 +158,10 @@ func getAccessClaims(c *gin.Context) (*domain.AccessClaim, bool) {
 	}
 	accessClaims := claims.(*domain.AccessClaim)
 	return accessClaims, exists
+}
+
+// HttpError example for swagger
+// not used
+type HttpError struct {
+	Detail string `json:"detail" example:"Some error comment"`
 }

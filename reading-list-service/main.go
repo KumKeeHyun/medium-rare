@@ -4,12 +4,24 @@ import (
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/config"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/controller"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/dao/sql"
+	_ "github.com/KumKeeHyun/medium-rare/reading-list-service/docs"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/util"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/util/erouter"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"go.uber.org/zap"
 )
+
+// @title Medium Rare Reading List Service
+// @version 0.0.1
+
+// @securityDefinitions.apikey JWTToken
+// @in header
+// @name Authorization
 
 func main() {
 	logger, err := util.BuildZapLogger()
@@ -33,6 +45,7 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	jwtAuth := middleware.CheckJwtAuth()
 	loggedIn := middleware.EnsureAuth()
