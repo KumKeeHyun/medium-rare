@@ -27,6 +27,13 @@ func NewTrendController(rrr dao.ReadRecordRepository, log *zap.Logger) *TrendCon
 	}
 }
 
+// ListTrend swagger
+// @Summary list trendy article
+// @Accept json
+// @Produce json
+// @Success 200 {object} adapter.ArticleList
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/trend [get]
 func (tc *TrendController) ListTrend(c *gin.Context) {
 	q := domain.Query{}
 	trend, err := tc.rrr.FindArticlesByQuery(q)
@@ -63,9 +70,18 @@ func (tc *TrendController) ListTrend(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"trend": articles})
+	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
+// ListTrendForUser swagger
+// @Summary list trendy article for user
+// @Accept json
+// @Produce json
+// @Success 200 {object} adapter.ArticleList
+// @Failure 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/trend/user [get]
 func (tc *TrendController) ListTrendForUser(c *gin.Context) {
 	claims, exists := getAccessClaims(c)
 	if !exists {
@@ -112,7 +128,7 @@ func (tc *TrendController) ListTrendForUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"trend": articles})
+	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
 func getAccessClaims(c *gin.Context) (*domain.AccessClaim, bool) {
@@ -122,4 +138,10 @@ func getAccessClaims(c *gin.Context) (*domain.AccessClaim, bool) {
 	}
 	accessClaims := claims.(*domain.AccessClaim)
 	return accessClaims, exists
+}
+
+// HttpError example for swagger
+// not used
+type HttpError struct {
+	Detail string `json:"detail" example:"Some error comment"`
 }

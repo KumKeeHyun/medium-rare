@@ -4,12 +4,23 @@ import (
 	"github.com/KumKeeHyun/medium-rare/trend-service/config"
 	"github.com/KumKeeHyun/medium-rare/trend-service/controller"
 	"github.com/KumKeeHyun/medium-rare/trend-service/dao/sql"
+	_ "github.com/KumKeeHyun/medium-rare/trend-service/docs"
 	"github.com/KumKeeHyun/medium-rare/trend-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util/erouter"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 )
+
+// @title Medium Rare Trend Service
+// @version 0.0.1
+
+// @securityDefinitions.apikey JWTToken
+// @in header
+// @name Authorization
 
 func main() {
 	logger, err := util.BuildZapLogger()
@@ -35,6 +46,7 @@ func main() {
 	defer er.Stop()
 
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	jwtAuth := middleware.CheckJwtAuth()
 	loggedIn := middleware.EnsureAuth()

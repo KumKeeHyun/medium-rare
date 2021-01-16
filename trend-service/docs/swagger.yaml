@@ -1,0 +1,76 @@
+definitions:
+  adapter.Article:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+    type: object
+  adapter.ArticleList:
+    properties:
+      article_list:
+        items:
+          $ref: '#/definitions/adapter.Article'
+        type: array
+    type: object
+  controller.HttpError:
+    properties:
+      detail:
+        example: Some error comment
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Medium Rare Trend Service
+  version: 0.0.1
+paths:
+  /v1/trend:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.ArticleList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: list trendy article
+  /v1/trend/user:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.ArticleList'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: list trendy article for user
+securityDefinitions:
+  JWTToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

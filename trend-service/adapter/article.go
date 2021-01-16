@@ -7,3 +7,9 @@ type Article struct {
 	UserID   int    `json:"user_id"`
 	UserName string `json:"user_name"`
 }
+
+// ArticleList example for swagger
+// not used
+type ArticleList struct {
+	ArticleList []Article `json:"article_list"`
+}
