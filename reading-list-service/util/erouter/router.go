@@ -87,9 +87,6 @@ func (er *eventRouter) Stop() {
 }
 
 func (er *eventRouter) startConsumerGroup() error {
-	// temp broker
-	config.App.KafkaConfig.Brokers = []string{"220.70.2.5:8082"}
-
 	er.log.Info("Create and start sarama consumer group",
 		zap.Strings("brokers", config.App.KafkaConfig.Brokers))
 

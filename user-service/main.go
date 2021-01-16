@@ -61,7 +61,7 @@ func main() {
 		user := v1.Group("/users")
 		{
 			user.GET("", uc.ListUsers)
-			user.GET("/:id", uc.GetUser)
+			user.GET("/:id", jwtAuth, loggedIn, uc.GetUser)
 			user.POST("", notLoggedIn, uc.CreateUser)
 			user.DELETE(":id", jwtAuth, loggedIn, uc.DeleteUser)
 

@@ -48,9 +48,20 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 // GET
 // /users/:id
 func (uc *UserController) GetUser(c *gin.Context) {
+	claims, err := getAccessClaime(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"detail": "unauthorized user"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
+		return
+	}
+
+	if claims.ID != id {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"detail": "URL param is not user's id"})
 		return
 	}
 

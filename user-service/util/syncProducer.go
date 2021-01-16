@@ -11,9 +11,6 @@ func BuildSyncProducer() (sarama.SyncProducer, error) {
 	cfg.Producer.Retry.Max = 10
 	cfg.Producer.Return.Successes = true
 
-	// temp broker
-	config.App.KafkaConfig.Brokers = []string{"220.70.2.5:8082"}
-
 	producer, err := sarama.NewSyncProducer(config.App.KafkaConfig.Brokers, cfg)
 	if err != nil {
 		return nil, err

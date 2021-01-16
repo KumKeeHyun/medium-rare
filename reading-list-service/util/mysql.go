@@ -8,9 +8,6 @@ import (
 )
 
 func BuildMysqlConnection() (*gorm.DB, error) {
-	// temp url
-	config.App.MysqlConfig.DbURL = "root:balns@tcp(220.70.2.5:8081)/readingDB?charset=utf8mb4&parseTime=True&loc=Local"
-
 	db, err := gorm.Open(mysql.Open(config.App.MysqlConfig.DbURL), &gorm.Config{})
 	if err != nil {
 		return nil, err
