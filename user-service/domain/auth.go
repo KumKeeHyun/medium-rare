@@ -19,6 +19,18 @@ type RefreshClaim struct {
 }
 
 type TokenPair struct {
-	AccessToken  string `json:"AccessToken"`
-	RefreshToken string `json:"RefreshToken"`
+	AccessToken  string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwibmFtZSI6InRlc3ROYW1lIiwiZ2VuZGVyIjoiTSIsImJpcnRoIjoxOTk5LCJleHAiOjE2MTA3Njk5MTksImlzcyI6ImtraCJ9.6efd8vn9BoFDgBDA9xQCph9xbXvnOaL1DTuYYgEanTQ"`
+	RefreshToken string `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNjEwODEyNTE5LCJpc3MiOiJra2gifQ.9UPSEA_3ngl3HGcch23qXnbO7W-ghfu2Qyqyc01w368"`
+}
+
+// AccessToken example for swagger
+// not used
+type AccessToken struct {
+	AccessToken string `json:"access_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwibmFtZSI6InRlc3ROYW1lIiwiZ2VuZGVyIjoiTSIsImJpcnRoIjoxOTk5LCJleHAiOjE2MTA3Njk5MTksImlzcyI6ImtraCJ9.6efd8vn9BoFDgBDA9xQCph9xbXvnOaL1DTuYYgEanTQ"`
+}
+
+// RefreshToken example for swagger
+// not used
+type RefreshToken struct {
+	RefreshToken string `json:"refresh_token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNjEwODEyNTE5LCJpc3MiOiJra2gifQ.9UPSEA_3ngl3HGcch23qXnbO7W-ghfu2Qyqyc01w368"`
 }

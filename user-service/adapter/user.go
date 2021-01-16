@@ -7,13 +7,13 @@ import (
 )
 
 type User struct {
-	ID        int       `json:"id"`
-	Email     string    `json:"email"`
-	Name      string    `json:"name"`
-	Gender    string    `json:"gender"`
-	Birth     int       `json:"birth"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int       `json:"id" example:"1"`
+	Email     string    `json:"email" example:"test@example.com"`
+	Name      string    `json:"name" example:"test"`
+	Gender    string    `json:"gender" example:"M"`
+	Birth     int       `json:"birth" example:"1999"`
+	CreatedAt time.Time `json:"created_at" example:"2021-01-15T09:44:35.151+09:00"`
+	UpdatedAt time.Time `json:"updated_at" example:"2021-01-15T09:44:35.151+09:00"`
 }
 
 func ToAdapterUser(du *domain.User) User {

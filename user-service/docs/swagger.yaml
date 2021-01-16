@@ -1,0 +1,243 @@
+definitions:
+  adapter.User:
+    properties:
+      birth:
+        example: 1999
+        type: integer
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      gender:
+        example: M
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: test
+        type: string
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+    type: object
+  controller.HttpError:
+    properties:
+      detail:
+        example: Some error comment
+        type: string
+    type: object
+  domain.AccessToken:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwibmFtZSI6InRlc3ROYW1lIiwiZ2VuZGVyIjoiTSIsImJpcnRoIjoxOTk5LCJleHAiOjE2MTA3Njk5MTksImlzcyI6ImtraCJ9.6efd8vn9BoFDgBDA9xQCph9xbXvnOaL1DTuYYgEanTQ
+        type: string
+    type: object
+  domain.CreateUser:
+    properties:
+      birth:
+        example: 1999
+        type: integer
+      email:
+        example: test@example.com
+        type: string
+      gender:
+        example: M
+        type: string
+      name:
+        example: test
+        type: string
+      password:
+        example: testpw
+        type: string
+    type: object
+  domain.LoginUser:
+    properties:
+      email:
+        example: test@example.com
+        type: string
+      password:
+        example: testpw
+        type: string
+    type: object
+  domain.RefreshToken:
+    properties:
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNjEwODEyNTE5LCJpc3MiOiJra2gifQ.9UPSEA_3ngl3HGcch23qXnbO7W-ghfu2Qyqyc01w368
+        type: string
+    type: object
+  domain.TokenPair:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwibmFtZSI6InRlc3ROYW1lIiwiZ2VuZGVyIjoiTSIsImJpcnRoIjoxOTk5LCJleHAiOjE2MTA3Njk5MTksImlzcyI6ImtraCJ9.6efd8vn9BoFDgBDA9xQCph9xbXvnOaL1DTuYYgEanTQ
+        type: string
+      refresh_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNjEwODEyNTE5LCJpc3MiOiJra2gifQ.9UPSEA_3ngl3HGcch23qXnbO7W-ghfu2Qyqyc01w368
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Medium Rare User Service
+  version: 0.0.1
+paths:
+  /v1/users:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: List all users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.User'
+        "400":
+          description: fail to unmashal body
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: create user
+  /v1/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user id
+          schema:
+            type: int
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: delete user
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/adapter.User'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: Show user
+  /v1/users/auth:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TokenPair'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: authorize user
+  /v1/users/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: refresh token
+        in: body
+        name: refresh_token
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RefreshToken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.AccessToken'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: refresh jwt token
+securityDefinitions:
+  JWTToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

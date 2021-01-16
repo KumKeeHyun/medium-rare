@@ -30,9 +30,13 @@ func NewUserController(uu usecase.UserUsecase, au usecase.AuthUsecase, sp sarama
 	}
 }
 
-// ListUsers ...
-// GET
-// /users
+// ListUsers swagger
+// @Summary List all users
+// @Accept json
+// @Produce json
+// @Success 200 {object} adapter.User
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/users [get]
 func (uc *UserController) ListUsers(c *gin.Context) {
 	us, err := uc.uu.FindUsers()
 	if err != nil {
@@ -44,9 +48,14 @@ func (uc *UserController) ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, aus)
 }
 
-// GetUser ...
-// GET
-// /users/:id
+// GetUser swagger
+// @Summary Show user
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} adapter.User
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/users/{id} [get]
 func (uc *UserController) GetUser(c *gin.Context) {
 	claims, err := getAccessClaime(c)
 	if err != nil {
@@ -74,10 +83,15 @@ func (uc *UserController) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, adapter.ToAdapterUser(&u))
 }
 
-// CreateUser ...
-// POST
-// /users
-// Body : json(domain.User:Email,Password,Name,Gender,Birth)
+// CreateUser swagger
+// @Summary create user
+// @Accept json
+// @Produce json
+// @Param user body domain.CreateUser true "user info"
+// @Success 200 {object} adapter.User
+// @Failure 400 {object} controller.HttpError "fail to unmashal body"
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/users [post]
 func (uc *UserController) CreateUser(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -100,9 +114,18 @@ func (uc *UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, adapter.ToAdapterUser(&userResult))
 }
 
-// DeleteUser ...
-// DELETE
-// /users/:id
+// DeleteUser swagger
+// @Summary delete user
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 int int "user id"
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 403 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/users/{id} [delete]
 func (uc *UserController) DeleteUser(c *gin.Context) {
 	claims, err := getAccessClaime(c)
 	if err != nil {
@@ -136,10 +159,15 @@ func (uc *UserController) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, id)
 }
 
-// Authorize ...
-// POST
-// /auth
-// Body : json(domain.User:Email,Password)
+// Authorize swagger
+// @Summary authorize user
+// @Accept json
+// @Produce json
+// @Param user body domain.LoginUser true "user info"
+// @Success 200 {object} domain.TokenPair
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Router /v1/users/auth [post]
 func (uc *UserController) Authorize(c *gin.Context) {
 	var user domain.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -156,10 +184,15 @@ func (uc *UserController) Authorize(c *gin.Context) {
 	c.JSON(http.StatusOK, tokenPair)
 }
 
-// RefreshAuth ...
-// POST
-// /auth/refresh
-// Body : json(refreshToken)
+// RefreshAuth swagger
+// @Summary refresh jwt token
+// @Accept json
+// @Produce json
+// @Param refresh_token body domain.RefreshToken true "refresh token"
+// @Success 200 {object} domain.AccessToken
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Router /v1/users/auth/refresh [post]
 func (uc *UserController) RefreshAuth(c *gin.Context) {
 	type tokenReqBody struct {
 		RefreshToken string `json:"refresh_token"`
@@ -187,4 +220,10 @@ func getAccessClaime(c *gin.Context) (*domain.AccessClaim, error) {
 
 	accessClaims := claims.(*domain.AccessClaim)
 	return accessClaims, nil
+}
+
+// HttpError example for swagger
+// not used
+type HttpError struct {
+	Detail string `json:"detail" example:"Some error comment"`
 }
