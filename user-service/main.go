@@ -38,8 +38,8 @@ func main() {
 		panic(err)
 	}
 
-	// syncProducer, err := util.BuildSyncProducer()
-	syncProducer, err := util.BuildMockSyncProducer()
+	syncProducer, err := util.BuildSyncProducer()
+	// syncProducer, err := util.BuildMockSyncProducer()
 	if err != nil {
 		panic(err)
 	}
