@@ -31,7 +31,14 @@ func NewArticleController(arr dao.ArticleReplyRepository,
 	}
 }
 
-// GET /v1/articles?p=
+// ListArticles swagger
+// @Summary list all articles
+// @Accept json
+// @Produce json
+// @Param p query string false "page num"
+// @Success 200 {object} domain.ArticleList
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/articles [get]
 func (ac *ArticleController) ListArticles(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("p"))
 	if err != nil {
@@ -47,7 +54,15 @@ func (ac *ArticleController) ListArticles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
-// GET /v1/articles/list
+// ListArticlesByIDList swagger
+// @Summary list articles where article id is in ids
+// @Accept json
+// @Produce json
+// @Param ids query string true "article id list separated by comma" Enums("1,2,3")
+// @Success 200 {object} []domain.ArticleNoReply
+// @Failure 400 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/articles/list [get]
 func (ac *ArticleController) ListArticlesByIDList(c *gin.Context) {
 	strIDs := strings.Split(c.Query("ids"), ",")
 	if len(strIDs) == 0 {
@@ -76,7 +91,15 @@ func (ac *ArticleController) ListArticlesByIDList(c *gin.Context) {
 	c.JSON(http.StatusOK, articles)
 }
 
-// GET /v1/articles/search?q=
+// SearchArticles swagger
+// @Summary list articles search by q
+// @Accept json
+// @Produce json
+// @Param q query string true "some word in article content"
+// @Success 200 {object} []domain.ArticleList
+// @Failure 400 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Router /v1/articles/search [get]
 func (ac *ArticleController) SearchArticles(c *gin.Context) {
 	query := c.Query("q")
 	if query == "" {
@@ -93,7 +116,16 @@ func (ac *ArticleController) SearchArticles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"article_list": articles})
 }
 
-// GET /v1/articles/article/:article-id
+// GetArticle swagger
+// @Summary show article
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Success 200 {object} domain.ArticleForSingle
+// @Failure 400 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id} [get]
 func (ac *ArticleController) GetArticle(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -137,7 +169,17 @@ func (ac *ArticleController) GetArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"article": article})
 }
 
-// POST /v1/articles/article
+// CreateArticle swagger
+// @Summary create article
+// @Accept json
+// @Produce json
+// @Param article body domain.CreateArticle true "title and content"
+// @Success 200 {object} domain.ArticleNoReply
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article [post]
 func (ac *ArticleController) CreateArticle(c *gin.Context) {
 	var article domain.Article
 	if err := c.ShouldBindJSON(&article); err != nil {
@@ -159,10 +201,21 @@ func (ac *ArticleController) CreateArticle(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"created": articleResult})
+	c.JSON(http.StatusOK, articleResult)
 }
 
-// DELETE /v1/articles/article/:article-id
+// DeleteArticle swagger
+// @Summary delete article
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Success 200 {object} integer "article id"
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 403 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id} [delete]
 func (ac *ArticleController) DeleteArticle(c *gin.Context) {
 	articleID, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -197,7 +250,18 @@ func (ac *ArticleController) DeleteArticle(c *gin.Context) {
 	c.JSON(http.StatusOK, articleID)
 }
 
-// POST /v1/articles/article/:article-id/reply
+// CreateReply swagger
+// @Summary create rely
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Param article body domain.CreateReply true "comment"
+// @Success 200 {object} domain.ReplyNoNested
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id}/reply [post]
 func (ac *ArticleController) CreateReply(c *gin.Context) {
 	var reply domain.Reply
 
@@ -228,10 +292,22 @@ func (ac *ArticleController) CreateReply(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"reply": replyResult})
+	c.JSON(http.StatusOK, replyResult)
 }
 
-// DELETE /v1/articles/article/:article-id/reply/:reply-id
+// DeleteReply swagger
+// @Summary delete reply
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Param reply-id path int true "reply's id"
+// @Success 200 {object} integer "reply id"
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 403 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id}/reply/{reply-id} [delete]
 func (ac *ArticleController) DeleteReply(c *gin.Context) {
 	articleID, err := strconv.Atoi(c.Param("article-id"))
 	if err != nil {
@@ -275,7 +351,19 @@ func (ac *ArticleController) DeleteReply(c *gin.Context) {
 	c.JSON(http.StatusOK, replyID)
 }
 
-// POST /v1/articles/article/:article-id/reply/:reply-id/nested-reply
+// CreateNestedReply swagger
+// @Summary create nested rely
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Param reply-id path int true "reply's id"
+// @Param reply body domain.CreateReply true "comment"
+// @Success 200 {object} domain.NestedReply
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id}/reply/{reply-id}/nested-reply [post]
 func (ac *ArticleController) CreateNestedReply(c *gin.Context) {
 	var reply domain.NestedReply
 
@@ -306,10 +394,23 @@ func (ac *ArticleController) CreateNestedReply(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"reply": replyResult})
+	c.JSON(http.StatusOK, replyResult)
 }
 
-// POST /v1/articles/article/:article-id/reply/:reply-id/nested-reply/:nested-reply-id
+// DeleteNestedReply swagger
+// @Summary delete nested reply
+// @Accept json
+// @Produce json
+// @Param article-id path int true "article's id"
+// @Param reply-id path int true "reply's id"
+// @Param nested-reply-id path int true "nested reply's id"
+// @Success 200 {object} integer "nested reply id"
+// @Failure 400 {object} controller.HttpError
+// @Failure 401 {object} controller.HttpError
+// @Failure 403 {object} controller.HttpError
+// @Failure 500 {object} controller.HttpError
+// @Security JWTToken
+// @Router /v1/articles/article/{article-id}/reply/{reply-id}/nested-reply/{nested-reply-id} [delete]
 func (ac *ArticleController) DeleteNestedReply(c *gin.Context) {
 	replyID, err := strconv.Atoi(c.Param("reply-id"))
 	if err != nil {
@@ -360,4 +461,10 @@ func getAccessClaims(c *gin.Context) (*domain.AccessClaim, bool) {
 	}
 	accessClaims := claims.(*domain.AccessClaim)
 	return accessClaims, exists
+}
+
+// HttpError example for swagger
+// not used
+type HttpError struct {
+	Detail string `json:"detail" example:"Some error comment"`
 }

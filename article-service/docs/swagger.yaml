@@ -1,0 +1,533 @@
+definitions:
+  controller.HttpError:
+    properties:
+      detail:
+        example: Some error comment
+        type: string
+    type: object
+  domain.Article:
+    properties:
+      claps:
+        example: 123
+        type: integer
+      content:
+        example: example content...
+        type: string
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      replies:
+        items:
+          $ref: '#/definitions/domain.Reply'
+        type: array
+      title:
+        example: example title
+        type: string
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+  domain.ArticleForSingle:
+    properties:
+      article:
+        $ref: '#/definitions/domain.Article'
+    type: object
+  domain.ArticleList:
+    properties:
+      article_list:
+        items:
+          $ref: '#/definitions/domain.ArticleNoReply'
+        type: array
+    type: object
+  domain.ArticleNoReply:
+    properties:
+      claps:
+        example: 123
+        type: integer
+      content:
+        example: example content...
+        type: string
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      title:
+        example: example title
+        type: string
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+  domain.CreateArticle:
+    properties:
+      content:
+        example: example content...
+        type: string
+      title:
+        example: example title
+        type: string
+    type: object
+  domain.CreateReply:
+    properties:
+      comment:
+        example: example comment...
+        type: string
+    type: object
+  domain.NestedReply:
+    properties:
+      claps:
+        example: 2
+        type: integer
+      comment:
+        example: example nested comment...
+        type: string
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      reply_id:
+        example: 1
+        type: integer
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+  domain.Reply:
+    properties:
+      article_id:
+        example: 1
+        type: integer
+      claps:
+        example: 5
+        type: integer
+      comment:
+        example: example comment...
+        type: string
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      nested_replies:
+        items:
+          $ref: '#/definitions/domain.NestedReply'
+        type: array
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+  domain.ReplyNoNested:
+    properties:
+      article_id:
+        example: 1
+        type: integer
+      claps:
+        example: 5
+        type: integer
+      comment:
+        example: example comment...
+        type: string
+      created_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      updated_at:
+        example: "2021-01-15T09:44:35.151+09:00"
+        type: string
+      user_id:
+        example: 1
+        type: integer
+      user_name:
+        example: test
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Medium Rare Article Service
+  version: 0.0.1
+paths:
+  /v1/articles:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: page num
+        in: query
+        name: p
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticleList'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: list all articles
+  /v1/articles/article:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: title and content
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateArticle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticleNoReply'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: create article
+  /v1/articles/article/{article-id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: article id
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: delete article
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticleForSingle'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: show article
+  /v1/articles/article/{article-id}/reply:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      - description: comment
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateReply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ReplyNoNested'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: create rely
+  /v1/articles/article/{article-id}/reply/{reply-id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      - description: reply's id
+        in: path
+        name: reply-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: reply id
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: delete reply
+  /v1/articles/article/{article-id}/reply/{reply-id}/nested-reply:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      - description: reply's id
+        in: path
+        name: reply-id
+        required: true
+        type: integer
+      - description: comment
+        in: body
+        name: reply
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateReply'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.NestedReply'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: create nested rely
+  /v1/articles/article/{article-id}/reply/{reply-id}/nested-reply/{nested-reply-id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: article's id
+        in: path
+        name: article-id
+        required: true
+        type: integer
+      - description: reply's id
+        in: path
+        name: reply-id
+        required: true
+        type: integer
+      - description: nested reply's id
+        in: path
+        name: nested-reply-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: nested reply id
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      security:
+      - JWTToken: []
+      summary: delete nested reply
+  /v1/articles/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: article id list separated by comma
+        enum:
+        - '"1'
+        - "2"
+        - 3"
+        in: query
+        name: ids
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.ArticleNoReply'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: list articles where article id is in ids
+  /v1/articles/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: some word in article content
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.ArticleList'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.HttpError'
+      summary: list articles search by q
+securityDefinitions:
+  JWTToken:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

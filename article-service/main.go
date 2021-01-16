@@ -4,14 +4,25 @@ import (
 	"github.com/KumKeeHyun/medium-rare/article-service/config"
 	"github.com/KumKeeHyun/medium-rare/article-service/controller"
 	"github.com/KumKeeHyun/medium-rare/article-service/dao/sql"
+	_ "github.com/KumKeeHyun/medium-rare/article-service/docs"
 	"github.com/KumKeeHyun/medium-rare/article-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/article-service/util"
+
 	"go.uber.org/zap"
 
 	"github.com/chenjiandongx/ginprom"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+// @title Medium Rare Article Service
+// @version 0.0.1
+
+// @securityDefinitions.apikey JWTToken
+// @in header
+// @name Authorization
 
 func main() {
 	logger, err := util.BuildZapLogger()
@@ -38,6 +49,7 @@ func main() {
 	logger.Info("set gin router")
 
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Use(ginprom.PromMiddleware(nil))
 	r.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
