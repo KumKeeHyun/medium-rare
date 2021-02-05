@@ -1,6 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
+	"time"
+
 	"github.com/KumKeeHyun/medium-rare/trend-service/config"
 	"github.com/KumKeeHyun/medium-rare/trend-service/controller"
 	"github.com/KumKeeHyun/medium-rare/trend-service/dao/sql"
@@ -9,6 +12,7 @@ import (
 	"github.com/KumKeeHyun/medium-rare/trend-service/util"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util/erouter"
 
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -33,6 +37,8 @@ func main() {
 		panic(err)
 	}
 
+	logger.Info("set dependency injection")
+
 	rrr := sql.NewSqlReadRecordRepository(db)
 	ec := controller.NewEventController(rrr, logger)
 	tc := controller.NewTrendController(rrr, logger)
@@ -45,8 +51,16 @@ func main() {
 	}
 	defer er.Stop()
 
+	logger.Info("set gin router")
+
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
+
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	r.Use(ginzap.RecoveryWithZap(logger, true))
 
 	jwtAuth := middleware.CheckJwtAuth()
 	loggedIn := middleware.EnsureAuth()
@@ -59,6 +73,9 @@ func main() {
 			trend.GET("/user", jwtAuth, loggedIn, tc.ListTrendForUser)
 		}
 	}
+
+	logger.Info("start gin server",
+		zap.String("addr", config.App.Address))
 
 	if err := r.Run(config.App.Address); err != nil {
 		logger.Fatal("fail to start gin server",

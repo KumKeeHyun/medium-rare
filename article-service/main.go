@@ -1,6 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
+	"time"
+
 	"github.com/KumKeeHyun/medium-rare/article-service/config"
 	"github.com/KumKeeHyun/medium-rare/article-service/controller"
 	"github.com/KumKeeHyun/medium-rare/article-service/dao/sql"
@@ -11,6 +14,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/chenjiandongx/ginprom"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
@@ -48,11 +52,17 @@ func main() {
 
 	logger.Info("set gin router")
 
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
+
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Use(ginprom.PromMiddleware(nil))
 	r.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
+
+	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	r.Use(ginzap.RecoveryWithZap(logger, true))
 
 	jwtAuth := middleware.CheckJwtAuth()
 	loggedIn := middleware.EnsureAuth()

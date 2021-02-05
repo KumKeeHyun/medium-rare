@@ -7,6 +7,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/chenjiandongx/ginprom v0.0.0-20201217063207-fe11b7f55a35
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gin-contrib/zap v0.0.1 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/google/go-cmp v0.5.2
 	github.com/prometheus/client_golang v1.9.0

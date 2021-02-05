@@ -1,6 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
+	"time"
+
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/config"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/controller"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/dao/sql"
@@ -9,6 +12,7 @@ import (
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/util"
 	"github.com/KumKeeHyun/medium-rare/reading-list-service/util/erouter"
 
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -34,6 +38,8 @@ func main() {
 		panic(err)
 	}
 
+	logger.Info("set dependency injection")
+
 	rr := sql.NewSqlReadingRepository(db)
 	ec := controller.NewEventController(rr, logger)
 	rc := controller.NewReadingController(rr, logger)
@@ -44,8 +50,16 @@ func main() {
 		panic(err)
 	}
 
+	logger.Info("set gin router")
+
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
+
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
+	r.Use(ginzap.RecoveryWithZap(logger, true))
 
 	jwtAuth := middleware.CheckJwtAuth()
 	loggedIn := middleware.EnsureAuth()
@@ -59,6 +73,9 @@ func main() {
 			list.GET("/saved", rc.ListSaved)
 		}
 	}
+
+	logger.Info("start gin server",
+		zap.String("addr", config.App.Address))
 
 	if err := r.Run(config.App.Address); err != nil {
 		logger.Fatal("fail to start gin server",

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"time"
 
 	"github.com/KumKeeHyun/medium-rare/user-service/config"
@@ -53,6 +54,9 @@ func main() {
 	uc := controller.NewUserController(uu, au, syncProducer, logger)
 
 	logger.Info("set gin router")
+
+	gin.SetMode(gin.ReleaseMode)
+	gin.DefaultWriter = ioutil.Discard
 
 	r := gin.Default()
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
