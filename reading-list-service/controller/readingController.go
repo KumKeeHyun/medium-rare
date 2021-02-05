@@ -51,7 +51,7 @@ func (rc *ReadingController) ListRecent(c *gin.Context) {
 
 	var articles []adapter.Article
 	ids := domain.ViewsToQuery(vieweds)
-	url := fmt.Sprintf("http://%s%s", config.App.ArticleConfig.Address, config.App.ArticleConfig.URL)
+	url := fmt.Sprintf("http://%s:%s%s", config.App.ArticleConfig.Host, config.App.ArticleConfig.Port, config.App.ArticleConfig.URL)
 
 	resp, err := resty.New().R().SetHeader("Content-Type", "application/json").
 		SetQueryParam("ids", ids).SetResult(&articles).
@@ -132,7 +132,7 @@ func (rc *ReadingController) ListSaved(c *gin.Context) {
 
 	var articles []adapter.Article
 	ids := domain.SavedsToQuery(saveds)
-	url := fmt.Sprintf("http://%s%s", config.App.ArticleConfig.Address, config.App.ArticleConfig.URL)
+	url := fmt.Sprintf("http://%s:%s%s", config.App.ArticleConfig.Host, config.App.ArticleConfig.Port, config.App.ArticleConfig.URL)
 
 	resp, err := resty.New().R().SetHeader("Content-Type", "application/json").
 		SetQueryParam("ids", ids).SetResult(&articles).

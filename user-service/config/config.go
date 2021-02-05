@@ -14,8 +14,11 @@ type AppConfig struct {
 }
 
 type DataConfig struct {
-	Driver string `yaml:"driver"`
-	DbURL  string `yaml:"dbUrl"`
+	Driver   string `yaml:"driver"`
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
 }
 
 type LogConfig struct {
@@ -54,7 +57,10 @@ func init() {
 	App.JWTSecret = getEnvStr("APP_JWTSECRET", "kkh")
 
 	App.MysqlConfig.Driver = getEnvStr("APP_DB_DRIVER", "mysql")
-	App.MysqlConfig.DbURL = getEnvStr("APP_DB_URL", "root:rootpw@tcp(127.0.0.1:3306)/userDB?charset=utf8mb4&parseTime=True&loc=Local")
+	App.MysqlConfig.Host = getEnvStr("APP_DB_HOST", "127.0.0.1")
+	App.MysqlConfig.Port = getEnvStr("APP_DB_PORT", "3306")
+	App.MysqlConfig.User = getEnvStr("APP_DB_USER", "root")
+	App.MysqlConfig.Password = getEnvStr("APP_DB_PASS", "balns")
 
 	App.ZapConfig.OutputPaths = getEnvStrAry("APP_LOG_OUTPUTS", []string{"stdout"})
 	App.ZapConfig.Level = getEnvStr("APP_LOG_LEVEL", "debug")

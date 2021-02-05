@@ -54,7 +54,7 @@ func (tc *TrendController) ListTrend(c *gin.Context) {
 		}
 		return result
 	}(trend)
-	url := fmt.Sprintf("http://%s%s", config.App.ArticleConfig.Address, config.App.ArticleConfig.URL)
+	url := fmt.Sprintf("http://%s:%s%s", config.App.ArticleConfig.Host, config.App.ArticleConfig.Port, config.App.ArticleConfig.URL)
 
 	resp, err := resty.New().R().SetHeader("Content-Type", "application/json").
 		SetQueryParam("ids", ids).SetResult(&articles).
@@ -112,7 +112,7 @@ func (tc *TrendController) ListTrendForUser(c *gin.Context) {
 		}
 		return result
 	}(trend)
-	url := fmt.Sprintf("http://%s%s", config.App.ArticleConfig.Address, config.App.ArticleConfig.URL)
+	url := fmt.Sprintf("http://%s:%s%s", config.App.ArticleConfig.Host, config.App.ArticleConfig.Port, config.App.ArticleConfig.URL)
 
 	resp, err := resty.New().R().SetHeader("Content-Type", "application/json").
 		SetQueryParam("ids", ids).SetResult(&articles).
