@@ -2,6 +2,7 @@ package main
 
 import (
 	"io/ioutil"
+	"net/http"
 	"time"
 
 	"github.com/KumKeeHyun/medium-rare/user-service/config"
@@ -87,6 +88,11 @@ func main() {
 			}
 		}
 	}
+
+	// for kubernetes liveness, readiness probe
+	r.GET("/healthy", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"healty": "ok"})
+	})
 
 	logger.Info("start gin server",
 		zap.String("addr", config.App.Address))

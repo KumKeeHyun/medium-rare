@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"time"
 
 	"github.com/KumKeeHyun/medium-rare/trend-service/config"
@@ -11,6 +13,7 @@ import (
 	"github.com/KumKeeHyun/medium-rare/trend-service/middleware"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util"
 	"github.com/KumKeeHyun/medium-rare/trend-service/util/erouter"
+	"github.com/go-resty/resty/v2"
 
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
@@ -76,6 +79,23 @@ func main() {
 
 	logger.Info("start gin server",
 		zap.String("addr", config.App.Address))
+
+	// for kubernetes liveness probe
+	r.GET("/healthy", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"healty": "ok"})
+	})
+
+	// for kubernetes readiness probe
+	r.GET("/ready", func(c *gin.Context) {
+		url := fmt.Sprintf("http://%s:%s/healthy", config.App.ArticleConfig.Host, config.App.ArticleConfig.Port)
+		resp, _ := resty.New().R().SetHeader("Content-Type", "application/json").Get(url)
+
+		if resp.IsSuccess() {
+			c.JSON(http.StatusOK, gin.H{"ready": "ok"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"ready": "not ok"})
+		}
+	})
 
 	if err := r.Run(config.App.Address); err != nil {
 		logger.Fatal("fail to start gin server",
