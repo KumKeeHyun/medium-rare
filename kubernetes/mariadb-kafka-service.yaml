@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-mariadb
+spec:
+  ports:
+  - port: 3306
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-mariadb
+subsets:
+  - addresses:
+    - ip: 111.222.111.222
+    ports:
+    - port: 13306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-kafka
+spec:
+  ports:
+  - port: 9092
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-kafka
+subsets:
+  - addresses:
+    - ip: 111.222.111.222
+    ports:
+    - port: 9092
